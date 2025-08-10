@@ -1,10 +1,12 @@
 import { Helmet } from "react-helmet-async";
 import { Link, useParams } from "react-router-dom";
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState, useEffect } from "react";
 import { ArrowLeft, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import SignalStrengthBar from "@/components/SignalStrengthBar";
 import { useSimulatedProximity } from "@/hooks/useSimulatedProximity";
+import { validateMessage, sanitizeMessage, messageRateLimiter } from "@/lib/validation";
+import { useToast } from "@/hooks/use-toast";
 
 interface Message { id: string; text: string; sender: "me" | "them"; createdAt: number }
 
@@ -18,25 +20,71 @@ export default function ChatPage() {
     { id: "2", text: "Loud and clear. What's up?", sender: "me", createdAt: Date.now() - 30000 },
   ]);
   const [draft, setDraft] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const listRef = useRef<HTMLDivElement>(null);
+  const { toast } = useToast();
 
-  const send = () => {
+  const send = async () => {
+    if (isSubmitting) return;
+    
     const text = draft.trim();
     if (!text) return;
+
+    // Validate message
+    const validation = validateMessage(text);
+    if (!validation.isValid) {
+      toast({
+        title: "Invalid message",
+        description: validation.error,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Check rate limiting
+    if (!messageRateLimiter.canSendMessage()) {
+      const remainingTime = Math.ceil(messageRateLimiter.getRemainingTime() / 1000);
+      toast({
+        title: "Too many messages",
+        description: `Please wait ${remainingTime} seconds before sending another message.`,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+    const sanitizedText = sanitizeMessage(text);
     const now = Date.now();
-    setMessages((prev) => [
-      ...prev,
-      { id: String(now), text, sender: "me", createdAt: now },
-    ]);
-    setDraft("");
-    // Simulate reply
-    window.setTimeout(() => {
+    
+    try {
       setMessages((prev) => [
         ...prev,
-        { id: String(now + 1), text: "Copy that. Over.", sender: "them", createdAt: now + 1000 },
+        { id: String(now), text: sanitizedText, sender: "me", createdAt: now },
       ]);
-      listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: "smooth" });
-    }, 1000);
+      setDraft("");
+      
+      // Auto-scroll to bottom
+      setTimeout(() => {
+        listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: "smooth" });
+      }, 100);
+      
+      // Simulate reply
+      setTimeout(() => {
+        setMessages((prev) => [
+          ...prev,
+          { id: String(now + 1), text: "Copy that. Over.", sender: "them", createdAt: now + 1000 },
+        ]);
+        listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: "smooth" });
+      }, 1000);
+    } catch (error) {
+      toast({
+        title: "Failed to send message",
+        description: "Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -49,7 +97,7 @@ export default function ChatPage() {
 
       <header className="sticky top-0 z-10 bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
         <div className="flex items-center gap-3 p-3">
-          <Link to="/scan" aria-label="Back to scan" className="hover-scale">
+          <Link to="/" aria-label="Back to welcome" className="hover-scale">
             <Button variant="ghost" size="icon"><ArrowLeft /></Button>
           </Link>
           <div className="flex-1">
@@ -75,14 +123,31 @@ export default function ChatPage() {
         className="p-3 border-t bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60"
       >
         <div className="flex items-center gap-2">
-          <input
-            value={draft}
-            onChange={(e) => setDraft(e.target.value)}
-            placeholder="Transmit a message…"
-            className="flex-1 h-11 rounded-lg border bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-          />
-          <Button type="submit" variant="hero" size="icon" aria-label="Send">
-            <Send />
+          <div className="flex-1 relative">
+            <input
+              value={draft}
+              onChange={(e) => setDraft(e.target.value)}
+              placeholder="Transmit a message…"
+              maxLength={500}
+              disabled={isSubmitting}
+              className="w-full h-11 rounded-lg border bg-background px-3 pr-12 text-sm focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50"
+            />
+            {draft.length > 0 && (
+              <span className={`absolute right-3 top-3 text-xs ${
+                draft.length > 450 ? 'text-destructive' : 'text-muted-foreground'
+              }`}>
+                {draft.length}/500
+              </span>
+            )}
+          </div>
+          <Button 
+            type="submit" 
+            variant="hero" 
+            size="icon" 
+            aria-label="Send"
+            disabled={isSubmitting || !draft.trim()}
+          >
+            <Send className={isSubmitting ? 'animate-pulse' : ''} />
           </Button>
         </div>
       </form>

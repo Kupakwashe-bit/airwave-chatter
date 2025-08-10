@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import SignalStrengthBar from "@/components/SignalStrengthBar";
 import { useSimulatedProximity } from "@/hooks/useSimulatedProximity";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { Scan } from "lucide-react";
 
 export default function ScanPage() {
@@ -18,9 +19,12 @@ export default function ScanPage() {
 
       <header className="flex items-center justify-between mb-4">
         <h1 className="text-xl font-semibold">People in Range</h1>
-        <Button variant="secondary" size="sm" className="hover-scale" aria-label="Rescan">
-          <Scan className="mr-2" /> Rescan
-        </Button>
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+          <Button variant="secondary" size="sm" className="hover-scale" aria-label="Rescan">
+            <Scan className="mr-2" /> Rescan
+          </Button>
+        </div>
       </header>
 
       <section className="space-y-3 animate-fade-in">

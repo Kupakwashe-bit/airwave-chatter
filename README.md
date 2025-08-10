@@ -1,73 +1,176 @@
-# Welcome to your Lovable project
+# AirWave Chatter
 
-## Project info
+A modern, proximity-based radio chat application built with React, TypeScript, and Vite. Experience simulated radio-style communication with signal strength indicators and proximity-based user discovery.
 
-**URL**: https://lovable.dev/projects/0f984dc2-007e-4ba5-849f-55567344b0a3
+## ✨ Features
 
-## How can I edit this code?
+- **Proximity-Based Chat**: Discover and chat with simulated nearby users
+- **Signal Strength Indicators**: Visual feedback on connection quality
+- **Real-time Messaging**: Instant message delivery with typing indicators
+- **Dark/Light Mode**: Fully responsive theme switching
+- **Input Validation**: Secure message handling with XSS protection
+- **Rate Limiting**: Built-in spam protection
+- **Error Boundaries**: Graceful error handling and recovery
+- **Accessibility**: ARIA labels and keyboard navigation
+- **Progressive Enhancement**: Works offline with service worker ready
 
-There are several ways of editing your application.
+## 🚀 Quick Start
 
-**Use Lovable**
+### Prerequisites
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/0f984dc2-007e-4ba5-849f-55567344b0a3) and start prompting.
+- Node.js 18+ 
+- npm or yarn
 
-Changes made via Lovable will be committed automatically to this repo.
+### Installation
 
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
+```bash
+# Clone the repository
 git clone <YOUR_GIT_URL>
+cd airwave-chatter
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+# Install dependencies
+npm install
 
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Start development server
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+### Available Scripts
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+```bash
+npm run dev          # Start development server
+npm run build        # Build for production
+npm run preview      # Preview production build
+npm run lint         # Run ESLint
+npm run lint:fix     # Fix ESLint errors automatically
+npm run type-check   # Run TypeScript type checking
+```
 
-**Use GitHub Codespaces**
+## 🛠 Technology Stack
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+- **Framework**: React 18 with TypeScript
+- **Build Tool**: Vite
+- **Styling**: Tailwind CSS with shadcn/ui components
+- **Routing**: React Router DOM
+- **State Management**: React hooks with context
+- **Form Handling**: React Hook Form with Zod validation
+- **Icons**: Lucide React
+- **Toast Notifications**: Sonner
 
-## What technologies are used for this project?
+## 🎨 Architecture
 
-This project is built with:
+### Project Structure
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+```
+src/
+├── components/
+│   ├── ui/                 # Reusable UI components
+│   ├── ErrorBoundary.tsx   # Error handling
+│   ├── LoadingSpinner.tsx  # Loading states
+│   ├── ThemeProvider.tsx   # Theme management
+│   └── ThemeToggle.tsx     # Theme switcher
+├── hooks/
+│   └── useSimulatedProximity.ts  # User proximity simulation
+├── lib/
+│   ├── utils.ts           # Utility functions
+│   └── validation.ts      # Input validation & security
+├── pages/
+│   ├── Chat.tsx           # Chat interface
+│   ├── Scan.tsx           # User discovery
+│   ├── Splash.tsx         # Landing page
+│   └── NotFound.tsx       # 404 page
+└── types/                 # TypeScript definitions
+```
 
-## How can I deploy this project?
+### Security Features
 
-Simply open [Lovable](https://lovable.dev/projects/0f984dc2-007e-4ba5-849f-55567344b0a3) and click on Share -> Publish.
+- **XSS Protection**: All user input is sanitized
+- **Input Validation**: Zod schemas for type-safe validation  
+- **Rate Limiting**: Message sending limits to prevent spam
+- **Content Security**: Script injection prevention
 
-## Can I connect a custom domain to my Lovable project?
+## 🎯 Usage
 
-Yes, you can!
+1. **Start Scanning**: Launch the app and click "Start Scanning"
+2. **Discover Users**: View nearby simulated users with signal strength
+3. **Start Chatting**: Click on any user to begin a conversation
+4. **Send Messages**: Type and send messages with real-time feedback
+5. **Theme Toggle**: Switch between light/dark modes
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+## 🔧 Configuration
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+### Environment Variables
+
+Create a `.env` file for custom configuration:
+
+```env
+VITE_APP_TITLE="AirWave Chatter"
+VITE_MAX_MESSAGE_LENGTH=500
+VITE_RATE_LIMIT_MESSAGES=10
+VITE_RATE_LIMIT_WINDOW=60000
+```
+
+### Customization
+
+- **Themes**: Modify `src/index.css` for custom color schemes
+- **Components**: Extend shadcn/ui components in `src/components/ui/`
+- **Validation**: Update schemas in `src/lib/validation.ts`
+
+## 📱 Mobile Support
+
+- Responsive design for all screen sizes
+- Touch-friendly interactions
+- Progressive Web App (PWA) ready
+- Capacitor integration for native mobile apps
+
+## 🧪 Testing
+
+```bash
+# Type checking
+npm run type-check
+
+# Linting
+npm run lint
+
+# Fix linting issues
+npm run lint:fix
+```
+
+## 📦 Building for Production
+
+```bash
+npm run build
+npm run preview  # Preview the build locally
+```
+
+## 🚀 Deployment
+
+The app can be deployed to any static hosting service:
+
+- **Vercel**: Connect your GitHub repo
+- **Netlify**: Drag and drop the `dist` folder
+- **GitHub Pages**: Use GitHub Actions
+- **Firebase Hosting**: Use Firebase CLI
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/amazing-feature`
+3. Commit changes: `git commit -m 'Add amazing feature'`
+4. Push to the branch: `git push origin feature/amazing-feature`
+5. Open a Pull Request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## 🆘 Support
+
+For support and questions:
+- Open an issue on GitHub
+- Check the documentation
+- Review existing issues and discussions
+
+---
+
+**Made with ❤️ using React, TypeScript, and modern web technologies**
